@@ -69,7 +69,7 @@ for i in range(len(incidence.index)):
         mesa_death.extend(np.subtract(mesa.deaths[mesa.date == incidence.index[i]].tolist(), mesa.deaths[mesa.date == incidence.index[i-1]].tolist()))
 incidence['mesa_case'] = mesa_case
 incidence['mesa_death'] = mesa_death
-del i, mesa_case, mesa_death
+del i, mesa, mesa_case, mesa_death
 
 
 # Add Colorado case, death incidence rates to df
@@ -84,7 +84,7 @@ for i in range(len(incidence.index)):
         col_death.extend([np.subtract(sum(colorado.deaths[colorado.date == incidence.index[i]].tolist()), sum(colorado.deaths[colorado.date == incidence.index[i-1]].tolist()))])
 incidence['col_case'] = col_case
 incidence['col_death'] = col_death
-del i, col_case, col_death
+del i, colorado, col_case, col_death
 
 
 # Add CMU incidence and tests to df
@@ -109,7 +109,7 @@ dt = []
 for i in range(len(incidence)):
     dt.append(datetime.strptime(incidence.index[i], '%Y-%m-%d'))
 incidence['dt'] = dt
-del dt
+del dt, i
 
 # Filter by semester date ranges (Aug 20 - Apr 30)
 incidence = incidence[incidence.dt > datetime.strptime('2020-08-19', '%Y-%m-%d')]
@@ -128,6 +128,7 @@ fall = incidence.loc[(incidence.dt < datetime.strptime('2021-01-01', '%Y-%m-%d')
 spring = incidence.loc[(incidence.dt >= datetime.strptime('2021-01-01', '%Y-%m-%d')),]
 fall_pos = np.nansum(fall.cmu_case)/np.nansum(fall.cmu_test)
 spring_pos = np.nansum(spring.cmu_case)/np.nansum(spring.cmu_test)
+del fall, fall_pos, spring, spring_pos
 
 #%%
 
@@ -153,12 +154,33 @@ def crosscor(x, y, max_lag):
     corr = []
     for i in range(1, max_lag + 1):
         corr.append(np.corrcoef(x[:-i], y[i:])[0][1])     
-    return(max(corr), np.argmax(corr)+1)
+    return(corr, max(corr), np.argmax(corr)+1)
           
-c_case, l_case = crosscor(corr_data.cmu_case, corr_data.mesa_case, 56)
-c_death, l_death = crosscor(corr_data.cmu_case, corr_data.mesa_death, 56) 
+c_corr, c_case, l_case = crosscor(corr_data.mesa_case, corr_data.cmu_case, 14)
+m_corr, m_case, ml_case = crosscor(corr_data.cmu_case, corr_data.mesa_case, 14)
+d_corr, c_death, l_death = crosscor(corr_data.cmu_case, corr_data.mesa_death, 14) 
 
-del corr_data, c_case, c_death, l_case, l_death
+del c_case, c_death, d_corr, l_case, l_death, m_case, ml_case
+
+
+#%%
+
+plt.rcParams['figure.dpi'] = 800
+plt.rcParams['savefig.dpi'] = 800
+
+# Plot correlation as function of lag time
+fig, (ax1) = plt.subplots(1, 1, figsize = (5, 3))
+sns.despine()
+c_corr.append(np.corrcoef(corr_data.cmu_case, corr_data.mesa_case)[0][1])
+c_corr.extend(m_corr)
+ax1.vlines(3, 0, 0.75, linestyles='dashed', color = 'black')
+ax1.plot(list(range(-14, 15, 1)), c_corr)
+ax1.set_xlabel('Lag Time (Days)')
+ax1.set_ylabel('Correlation')
+plt.savefig('data/out/rolling.png', dpi = 800)
+plt.savefig('data/out/rolling.svg')
+
+del ax1, c_corr, fig, m_corr
 
 #%%
 
@@ -183,6 +205,8 @@ ax2.set_ylabel('Percent of Tests Positive')
 fig.tight_layout()
 plt.savefig('data/out/test_pos.png', dpi = 800)
 plt.savefig('data/out/test_pos.svg')
+
+del ax1, ax2, fig, label
 
 #%%
 
@@ -210,4 +234,4 @@ fig.tight_layout()
 plt.savefig('data/out/counts.png')
 plt.savefig('data/out/counts.svg')
 
-
+del ax1, ax2, fig, label

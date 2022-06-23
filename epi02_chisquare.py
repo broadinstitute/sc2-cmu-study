@@ -126,7 +126,19 @@ loc_exp = np.multiply(np.divide([sum(sports.sports_population[sports['loc'] == '
 s = stats.chisquare(loc_obs, loc_exp)  
 p = ((loc_obs - loc_exp)/loc_exp)
 
-del contact_obs, contact_exp, loc_obs, loc_exp, s, p
+# fall vs. spring sports
+seas_obs = [sum(sports.sports_cases[sports['season'] == 'fall']),\
+           sum(sports.sports_cases[sports['season'] == 'spring']),\
+           sum(sports.sports_cases[sports['season'] == 'both'])    ]
+
+seas_exp = np.multiply(np.divide([sum(sports.sports_population[sports.season == 'fall']), 
+              sum(sports.sports_population[sports.season == 'spring']), 
+              sum(sports.sports_population[sports.season == 'both'])], sum(sports.sports_population)), sum(sports.sports_cases))
+                     
+s = stats.chisquare(seas_obs, seas_exp)  
+p = ((seas_obs - seas_exp)/seas_exp)
+
+del contact_obs, contact_exp, loc_obs, loc_exp, seas_obs, seas_exp, s, p
 
 #%%      
                

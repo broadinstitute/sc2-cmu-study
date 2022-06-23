@@ -36,7 +36,7 @@ del fe
 
 # Residence hall incidence rates as function of hall parameters
 X = halls[['hall_population', 'occupancy', 'floors', 'dining',\
-           'private_bath', 'RA', 'sqft', 'height', 'volume_per_person']]
+           'private_bath', 'RA', 'sqft', 'height', 'volume_per_person', 'WW']]
 y = halls['hall_cases']/halls['hall_population']
 
 
@@ -45,11 +45,11 @@ corr = X.corr(method='spearman')
 corr.rename({'hall_population': 'Number of Students', 'occupancy': 'Percent Occupied',
              'floors': 'Floors', 'dining': 'Dining Hall', 'private_bath': 'In-Unit Bathroom',
              'RA': 'Number of RAs', 'sqft': 'Square Footage', 'height': 'Ceiling Height',
-             'volume_per_person': 'Volume per Person'}, axis='index', inplace = True)
+             'volume_per_person': 'Volume per Person', 'WW': 'Wastewater Surveillance'}, axis='index', inplace = True)
 corr.rename({'hall_population': 'Number of Students', 'occupancy': 'Percent Occupied', 
              'floors': 'Floors', 'dining': 'Dining Hall', 'private_bath': 'In-Unit Bathroom',
              'RA': 'Number of RAs', 'sqft': 'Square Footage', 'height': 'Ceiling Height',
-             'volume_per_person': 'Volume per Person'}, axis='columns', inplace = True)
+             'volume_per_person': 'Volume per Person', 'WW': 'Wastewater Surveillance'}, axis='columns', inplace = True)
 
 # Mask upper triangle
 mask = np.zeros_like(corr, dtype=np.bool)
@@ -103,8 +103,7 @@ rmse = np.sqrt(np.mean(results.resid**2))
 # Actual vs. predicted hall incidence rates
 fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(8, 10), dpi = 800)
 sns.despine()
-ax1.scatter(results.predict(X[list(combo[bic.index(min(bic))])]), y, color = 'black')
-ax1.plot(np.arange(0.5, 0.3, 0.05), np.arange(0.5, 0.3, 0.05), linestyle = 'dashed', color = 'black', alpha = 0.5)
+ax1.scatter(results.predict(X[list(combo[bic.index(min(bic))])]), y, c = halls.private_bath)
 r, p = stats.pearsonr(results.predict(X[list(combo[bic.index(min(bic))])]), y)
 labs = []
 for i in range(len(halls.index)): 
@@ -182,6 +181,6 @@ plt.savefig('data/out/leave_one_out.svg')
 
 rmse = np.sqrt(np.mean((halls.pred - y)**2))
 
-del aic, ax1, ax2, bic, combo, fig, labs, model, res, results, X, Xh, Xk, x, y, yh, yi
+del aic, ax1, ax2, bic, combo, fig, labs, model, text, texts, res, results, rmse, X, Xh, Xk, x, y, yh, yi
 
 

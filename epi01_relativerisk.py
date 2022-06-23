@@ -19,12 +19,12 @@ os.chdir('/Users/bpetros/OneDrive - Harvard University/cmu')
 import matplotlib as mpl
 import matplotlib.font_manager as fm
 
-fe = fm.FontEntry(
-    fname='/Users/bpetros/opt/anaconda3/pkgs/matplotlib-base-3.5.1-py38hfb0c5b7_0/lib/python3.8/site-packages/matplotlib/mpl-data/fonts/ttf/Montserrat-Medium.ttf',
-    name='Montserrat')
-fm.fontManager.ttflist.insert(0, fe) 
-mpl.rcParams['font.family'] = fe.name 
-del fe, fm
+# fe = fm.FontEntry(
+#     fname='/Users/bpetros/opt/anaconda3/pkgs/matplotlib-base-3.5.1-py38hfb0c5b7_0/lib/python3.8/site-packages/matplotlib/mpl-data/fonts/ttf/Montserrat-Medium.ttf',
+#     name='Montserrat')
+# fm.fontManager.ttflist.insert(0, fe) 
+# mpl.rcParams['font.family'] = fe.name 
+# del fe, fm
 
 #%%
 
@@ -106,6 +106,7 @@ r = [s[0], m[0], c[0]]
 err = [[s[1], m[1], c[1]], [s[2], m[2], c[2]]]
 
 sns.set_style("whitegrid", {'axes.grid' : False})
+sns.set(font="Montserrat")
 fig, ax = plt.subplots(figsize = (4, 5))
 ax.axhline(1, ls='--', linewidth=1, color='black')
 sns.despine()
@@ -120,11 +121,10 @@ for i in range(len(r)):
     ax.plot(x, y, "o", color="black", markersize = 10)
     n += 1
 ax.set_ylim([0.75, 2.9])
-ax.set_xlabel("Student Groups", fontsize = 14)
-ax.set_ylabel("Relative Risk", fontsize = 14)
+ax.set_ylabel("Relative Risk", fontsize = 14, font = 'Montserrat')
 ax.set(xticks=[0, 1, 2])
-ax.set_xticklabels(l, rotation=45, fontsize = 12)
-fig.tight_layout()
+ax.set_xticklabels(l, rotation=45, fontsize = 12, font = 'Montserrat')
+#fig.tight_layout()
 plt.savefig('data/out/relative_risk.png')
 plt.savefig('data/out/relative_risk.svg')
 del ax, c, err, fig, i, l, m, n, r, s, x, y
