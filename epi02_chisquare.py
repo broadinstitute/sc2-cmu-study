@@ -40,6 +40,7 @@ grade.set_index('year', inplace = True)
 
 # drop years without known population sizes
 grade.drop('Year E', inplace = True)
+grade.drop('Year F', inplace = True)
 grade.drop('Year G', inplace = True)
 
 spring = []
@@ -47,8 +48,8 @@ fall = []
 
 # cases per class year, for fall and for spring
 for i in grade.index:
-    spring.append(sum((meta.Class_Year == i) & (meta.date < datetime.strptime('2021-01-01', '%Y-%m-%d'))))
-    fall.append(sum((meta.Class_Year == i) & (meta.date > datetime.strptime('2021-01-01', '%Y-%m-%d'))))
+    spring.append(sum((meta.Class_Year == i) & (meta.date > datetime.strptime('2021-01-01', '%Y-%m-%d'))))
+    fall.append(sum((meta.Class_Year == i) & (meta.date < datetime.strptime('2021-01-01', '%Y-%m-%d'))))
 
 grade['spring_cases'] = spring
 grade['fall_cases'] = fall
@@ -79,7 +80,7 @@ del f, s, p
 
 
 # plot observed vs. expected counts
-f, (ax1) = plt.subplots(1,1, figsize = (6,8), dpi = 800)
+f, (ax1) = plt.subplots(1,1, figsize = (6,6), dpi = 800)
 sns.despine()
 col = {'Fall 2020':'#000000','Spring 2021':'#737373'}
 ax1.scatter(sp.exp, sp.oe, s = 25, c = sp['sem'].map(col))
@@ -93,7 +94,7 @@ adjust_text(texts, add_objects = line, force_objects=(0.05, 0.05), arrowprops=di
               color='black', alpha=0.5), expand_points=(1.2,1.2))
 ax1.set_title('Class Year', size = 18)
 ax1.set_xlabel('Expected Cases', size = 14)
-ax1.set_ylabel('Observed Cases - Expected Cases)/Expected Cases', size = 14)
+ax1.set_ylabel('(Observed Cases - Expected Cases)/Expected Cases', size = 14)
 f.tight_layout()
 plt.savefig('data/out/class_years.png')
 plt.savefig('data/out/class_years.svg')
