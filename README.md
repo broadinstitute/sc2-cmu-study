@@ -5,4 +5,4 @@ Files beginning with 'epi' document analyses of epidemiological and demographic 
 
 The 'overdisp' script calculates the overdispersion parameter associated with genomic clusters and social contacts.
 
-The 'wastewater_analyses_etc' jupyter notebook contains code necessary to generate all wastewater analyses and relevant figures. In addition, it contains a few contact-tracing analyses, clinical sequencing analyses, and the intra-host allele analysis for B.1.429.1.
+The 'wastewater_analyses_etc' Jupyter Notebook contains code associated with all wastewater analyses and figures. In addition, it contains some contact-tracing analyses, clinical sequencing analyses, and the within-host minor allele analysis for B.1.429.1.
