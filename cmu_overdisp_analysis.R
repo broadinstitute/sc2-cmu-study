@@ -1,6 +1,6 @@
 #script for looking at overdispersion in genetic, ct, and wifi data
 # also includes isolation period wifi contact counts;
-setwd("~/Desktop/projects/covid data analysis/cmu")
+setwd("~/Desktop/projects/covid_data_analysis/cmu")
 library(data.table)
 library(fitdistrplus)
 library(showtext) 
@@ -27,6 +27,7 @@ hist(cluster_sizes_new$N, xlim=c(0,40), breaks=seq(0,40,1), freq=FALSE, ylim = c
 axis(2, at = c(0, 0.2, 0.4, 0.6, 0.8),
      labels = c("0%","20%","40%","60%","80%"),cex.axis=1.5)
 cluster_size_fit = fitdist(cluster_sizes_new$N, "nbinom") 
+cluster_size_confint = c(cluster_size_fit$estimate[1]-1.96*cluster_size_fit$sd[1], cluster_size_fit$estimate[1]+1.96*cluster_size_fit$sd[1])
 cluster_size_fitpoints = dnbinom(0:38, size=cluster_size_fit$estimate[1], mu=cluster_size_fit$estimate[2])
 lines(seq(0.5, 38.5,1), cluster_size_fitpoints, lwd="1", type='b',pch=20,cex=1)
 text(20,0.4, paste("k=", round(cluster_size_fit$estimate[1],2), sep=""),cex=1.5)
@@ -54,6 +55,7 @@ hist(cmu_ct$total_contacts,xlim=c(0,40), breaks=seq(0,30,1), freq=FALSE, ylim = 
 axis(2, at = c(0, 0.2, 0.4, 0.6, 0.8),
      labels = c("0%","20%","40%","60%","80%"),cex.axis=1.5)
 ct_fit = fitdist(cmu_ct$total_contacts, "nbinom") 
+ct_size_confint = c(ct_fit$estimate[1]-1.96*ct_fit$sd[1], ct_fit$estimate[1]+1.96*ct_fit$sd[1])
 ct_fitpoints = dnbinom(0:38, size=ct_fit$estimate[1], mu=ct_fit$estimate[2])
 lines(seq(0.5, 38.5,1), ct_fitpoints, lwd="1", type='b',pch=20,cex=1)
 text(20,0.4, paste("k=", round(ct_fit$estimate[1],2), sep=""), cex=1.5)
@@ -115,6 +117,7 @@ hist(interaction_table$N,xlim=c(0,1200), breaks=seq(0,1200,15), freq=FALSE, ylim
 axis(2, at = c(0, 0.0025, 0.005, 0.0075, 0.01),
      labels = c("0%","0.25%","0.5%","0.75%","1%"),cex.axis=1.5)
 traced_fit = fitdist(interaction_table$N, "nbinom") 
+traced_size_confint = c(traced_fit$estimate[1]-1.96*traced_fit$sd[1], traced_fit$estimate[1]+1.96*traced_fit$sd[1])
 traced_fitpoints = dnbinom(seq(0, 1200,20), size=traced_fit$estimate[1], mu=traced_fit$estimate[2])
 lines(seq(0.5, 1200.5,20), traced_fitpoints, lwd="1", type='b',pch=20,cex=1)
 text(600,0.005, paste("k=", round(traced_fit$estimate[1],2), sep=""), cex=1.5)
