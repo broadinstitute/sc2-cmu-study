@@ -35,8 +35,9 @@ del fe
 #%%
 
 # Residence hall incidence rates as function of hall parameters
+halls['test_rates'] = halls.hall_tests/halls.hall_population
 X = halls[['hall_population', 'occupancy', 'floors', 'dining',\
-           'private_bath', 'RA', 'sqft', 'height', 'volume_per_person', 'WW']]
+           'private_bath', 'RA', 'sqft', 'height', 'volume_per_person', 'test_rates']]
 y = halls['hall_cases']/halls['hall_population']
 
 
@@ -45,11 +46,11 @@ corr = X.corr(method='spearman')
 corr.rename({'hall_population': 'Number of Students', 'occupancy': 'Percent Occupied',
              'floors': 'Floors', 'dining': 'Dining Hall', 'private_bath': 'In-Unit Bathroom',
              'RA': 'Number of RAs', 'sqft': 'Square Footage', 'height': 'Ceiling Height',
-             'volume_per_person': 'Volume per Person', 'WW': 'Wastewater Surveillance'}, axis='index', inplace = True)
+             'volume_per_person': 'Volume per Person', 'test_rates': 'Tests per Person'}, axis='index', inplace = True)
 corr.rename({'hall_population': 'Number of Students', 'occupancy': 'Percent Occupied', 
              'floors': 'Floors', 'dining': 'Dining Hall', 'private_bath': 'In-Unit Bathroom',
              'RA': 'Number of RAs', 'sqft': 'Square Footage', 'height': 'Ceiling Height',
-             'volume_per_person': 'Volume per Person', 'WW': 'Wastewater Surveillance'}, axis='columns', inplace = True)
+             'volume_per_person': 'Volume per Person', 'test_rates': 'Tests per Person'}, axis='columns', inplace = True)
 
 # Mask upper triangle
 mask = np.zeros_like(corr, dtype=np.bool)
@@ -103,7 +104,7 @@ rmse = np.sqrt(np.mean(results.resid**2))
 # Actual vs. predicted hall incidence rates
 fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(8, 10), dpi = 800)
 sns.despine()
-ax1.scatter(results.predict(X[list(combo[bic.index(min(bic))])]), y, c = halls.private_bath)
+ax1.scatter(results.predict(X[list(combo[bic.index(min(bic))])]), y, color = 'black')
 r, p = stats.pearsonr(results.predict(X[list(combo[bic.index(min(bic))])]), y)
 labs = []
 for i in range(len(halls.index)): 
@@ -118,7 +119,7 @@ del r, p, x, yi, text, texts
 
 # Residual plot: residuals vs. predicted hall incidence rates
 ax2.scatter(results.predict(X[list(combo[bic.index(min(bic))])]), results.resid, color = 'black')
-ax2.plot([0.1, 0.225], [0, 0], linestyle = 'dashed', color = 'black')
+ax2.plot([0.08, 0.24], [0, 0], linestyle = 'dashed', color = 'black')
 r, p = stats.pearsonr(results.predict(X[list(combo[bic.index(min(bic))])]), results.resid)
 texts = []
 for x, yi, text in zip(results.predict(X[list(combo[bic.index(min(bic))])]), results.resid, labs):
@@ -154,10 +155,10 @@ del hall, pred
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(18, 6))
 sns.despine()
 ax1.scatter(halls.pred, y - halls.pred, color = 'black')
-line = ax1.plot(np.arange(0.1, 0.3, 0.05), [0] * 4, linestyle = 'dashed', color = 'black', alpha = 0.5)
+line = ax1.plot(np.arange(0.05, 0.3, 0.05), [0] * 5, linestyle = 'dashed', color = 'black', alpha = 0.5)
 texts = []
 for x, yi, text in zip(halls.pred, y - halls.pred, labs):
-    texts.append(ax1.text(x, yi+0.005, text, size = 12))
+    texts.append(ax1.text(x, yi+0.003, text, size = 12))
 ax1.set_xlabel('Predicted Incidence', fontsize = 16)
 ax1.set_ylabel('Residuals', fontsize = 16)
 ax1.tick_params(axis='both', which='major', labelsize=12)

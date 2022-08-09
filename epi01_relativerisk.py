@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 import pandas as pd
+import scipy.stats as stats
 import seaborn as sns
 os.chdir('/Users/bpetros/OneDrive - Harvard University/cmu')
 
@@ -19,12 +20,12 @@ os.chdir('/Users/bpetros/OneDrive - Harvard University/cmu')
 import matplotlib as mpl
 import matplotlib.font_manager as fm
 
-# fe = fm.FontEntry(
-#     fname='/Users/bpetros/opt/anaconda3/pkgs/matplotlib-base-3.5.1-py38hfb0c5b7_0/lib/python3.8/site-packages/matplotlib/mpl-data/fonts/ttf/Montserrat-Medium.ttf',
-#     name='Montserrat')
-# fm.fontManager.ttflist.insert(0, fe) 
-# mpl.rcParams['font.family'] = fe.name 
-# del fe, fm
+fe = fm.FontEntry(
+    fname='/Users/bpetros/opt/anaconda3/pkgs/matplotlib-base-3.5.1-py38hfb0c5b7_0/lib/python3.8/site-packages/matplotlib/mpl-data/fonts/ttf/Montserrat-Medium.ttf',
+    name='Montserrat')
+fm.fontManager.ttflist.insert(0, fe) 
+mpl.rcParams['font.family'] = fe.name 
+del fe, fm
 
 #%%
 
@@ -42,23 +43,39 @@ meta = meta.loc[(meta.date <= datetime.strptime('2020-11-20', '%Y-%m-%d')) |
 
 # sports teams
 sports = pd.read_csv('data/in/sports_populations.csv')
-# calc sports team cases
-cases = []
-for team in sports.Sports_team:
-    cases.append(sum(meta.Sports_team == team) + sum(meta.Additional_Sports_team == team))
-sports['sports_cases'] = cases
-del cases, team
 sports.set_index('Sports_team', inplace = True)
+sport_test = pd.read_csv('data/in/sport-tests.csv', index_col = 0)
+# calc sports team cases and tests
+cases = []
+tests = []
+for team in sports.index:
+    cases.append(sum(meta.Sports_team == team) + sum(meta.Additional_Sports_team == team))
+    try:
+        tests.append(np.nansum(sport_test[sports.loc[team].team_name]))
+    except:
+        tests.append(np.nan)
+sports['sports_cases'] = cases
+sports['sports_tests'] = tests
+del cases, sport_test, team, tests
 sports.to_csv('data/out/sports_cases.csv')
+
+# no association b/w sports team testing rates and sports team incidence rates
+nansport = sports[~np.isnan(sports.sports_tests)]
+corr, pv = stats.pearsonr(nansport.sports_tests/nansport.sports_population, nansport.sports_cases/nansport.sports_population)
+del corr, nansport, pv
 
 # residence halls
 halls = pd.read_csv('data/in/hall_populations.csv')
+hall_test = pd.read_csv('data/in/hall-tests.csv', index_col = 0)
 # calc res hall cases
 cases = []
+tests = []
 for hall in halls.hall:
     cases.append(sum(meta.Residence_hall == hall))
+    tests.append(np.nansum(hall_test[hall]))
 halls['hall_cases'] = cases
-del cases, hall
+halls['hall_tests'] = tests
+del cases, hall, hall_test, tests
 halls.set_index('hall', inplace = True)
 halls.to_csv('data/out/hall_cases.csv')
 
@@ -83,17 +100,30 @@ def rr(pop, sub_pop, tot_case, sub_case):
 
 # assumed values
 cmu_pop = (8350 + 7670)/2 #from CMU, averaged fall and spring
+cmu_tests = 10842+12891 #from Fathom, fall and spring
 male = round(cmu_pop * 0.458) #from https://www.coloradomesa.edu/institutional-research/documents/student-profiles/eot_fall_total.pdf
 campus = sum(halls.hall_population)
 
 # sports team vs. not
 s = rr(cmu_pop, sum(sports.sports_population), len(meta), sum(meta.Sports_team.notna()))
 
+# sports testing ratio
+spp = np.nansum(sports.sports_tests)/sum(sports.sports_population)
+nspp = (cmu_tests - np.nansum(sports.sports_tests))/(cmu_pop - sum(sports.sports_population))
+spp/nspp
+
 # male vs. female
 m = rr(cmu_pop, male, len(meta), sum(meta.Sex == 'M'))
 
 # on- vs. off- campus
 c = rr(cmu_pop, campus, len(meta), sum(meta.Lives_on_campus == 'Yes'))
+
+# hall testing ratio
+hpp = np.nansum(halls.hall_tests)/sum(halls.hall_population)
+nhpp = (cmu_tests - np.nansum(halls.hall_tests))/(cmu_pop - sum(halls.hall_population))
+hpp/nhpp
+
+del spp, nspp, hpp, nhpp
 
 #%% 
 
@@ -124,7 +154,6 @@ ax.set_ylim([0.75, 2.9])
 ax.set_ylabel("Relative Risk", fontsize = 14, font = 'Montserrat')
 ax.set(xticks=[0, 1, 2])
 ax.set_xticklabels(l, rotation=45, fontsize = 12, font = 'Montserrat')
-#fig.tight_layout()
 plt.savefig('data/out/relative_risk.png')
 plt.savefig('data/out/relative_risk.svg')
 del ax, c, err, fig, i, l, m, n, r, s, x, y
