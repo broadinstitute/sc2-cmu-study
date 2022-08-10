@@ -8,3 +8,5 @@ The 'overdisp' script calculates the overdispersion parameter associated with ge
 The 'transmission-reconstruction' script uses Outbreaker2 (Campbell et al. 2018, BMC Bioinformatics) to reconstruct the outbreak using combinations of genomic, contact tracing, and WiFi proximity data.
 
 The 'wastewater_analyses_etc' Jupyter Notebook contains code associated with all wastewater analyses and figures. In addition, it contains some contact tracing, clinical sequencing, and B.1.429.1 minor allele analyses.
+
+The 'wifi_script_final' Jupyter Notebook contains all code associated with wifi proximity network analyses and figures. It also includes some contact tracing network analyses used for assessing the outbreaker2 results.
