@@ -7,6 +7,7 @@ library(showtext)
 library(svglite)
 library(stringr)
 library(readxl)
+library(curl)
 font_add_google("Montserrat", "montserrat") #load montserrat
 showtext_auto()
 par(family = 'montserrat')
@@ -155,12 +156,13 @@ pre_mean = mean(daily_meds[1:11,]$V1)
 iso_mean = mean(daily_meds[11:21,]$V1)
 post_mean = mean(daily_meds[21:31,]$V1)
 
-svglite("isolation_period_wifi.svg", width = 11, height = 4)
+svglite("isolation_period_wifi.svg", width = 11, height = 5)
 par(family = 'montserrat')
-plot((daily_meds$V1-pre_mean)/pre_mean, type='b',xaxt="n",xlab="Days Post-Positive",ylab="Median Interactions",
-     cex.lab=1.5, cex.axis=1.5, cex.main=1.5)
+plot((daily_meds$V1-pre_mean)/pre_mean, type='b',xaxt="n",yaxt="n",xlab="Days Post-Positive",ylab="Percent of Baseline Contacts",
+     cex.lab=1.5, cex.axis=1.5, cex.main=1.5,ylim=c(-1,0.3))
+axis(2, at=c(-1,-0.8,-0.6,-0.4,-0.2,0,0.2), labels=c(0,20,40,60,80,100,120))
 axis(1, at=seq(1,diff(range(daily_meds$offsetA))+1,2),
-     labels=daily_meds$offsetA[seq(1,diff(range(daily_meds$offsetA))+1,2)],cex.axis=1.5)
+     labels=daily_meds$offsetA[seq(1,diff(range(daily_meds$offsetA))+1,2)],cex.axis=1.5) 
 lines(seq(1,11,1),rep(0,11),lwd=2,col='darkgrey')
 dif = -(pre_mean-iso_mean)/pre_mean
 lines(seq(11,21,1), rep(dif,11),lwd=2,col='darkgrey')
