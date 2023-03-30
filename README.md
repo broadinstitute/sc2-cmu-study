@@ -1,5 +1,5 @@
 # sc2-cmu-study
-Scripts associated with the study "Multimodal surveillance of SARS-CoV-2 at a university enables development of a robust outbreak response framework," available at https://www.medrxiv.org/content/10.1101/2022.07.06.22277314v2.
+Scripts associated with the study "Multimodal surveillance of SARS-CoV-2 at a university enables development of a robust outbreak response framework," available at https://doi.org/10.1016/j.medj.2022.09.003.
 
 Files beginning with 'epi' document analyses of epidemiological and demographic parameters of the SARS-CoV-2 outbreak.
 
